@@ -1,0 +1,284 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  background: #fafafa;
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: #1a1a1a;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 2.2em;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 0.95em;
+  margin-bottom: 50px;
+  font-weight: 400;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1px;
+  margin-bottom: 50px;
+  background: #e0e0e0;
+  border: 1px solid #e0e0e0;
+}
+
+.stat-card {
+  background: white;
+  padding: 30px;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.stat-card:hover {
+  background: #fafafa;
+}
+
+.stat-card h3 {
+  color: #666;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+
+.stat-card .value {
+  font-size: 2em;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+.pagination-controls {
+  background: white;
+  padding: 25px 40px;
+  margin-bottom: 50px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 0.95em;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 24px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn:hover:not(:disabled) {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-secondary {
+  background: #666;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #777;
+}
+
+.chart-container {
+  background: white;
+  padding: 40px;
+  margin-bottom: 50px;
+  border: 1px solid #e0e0e0;
+}
+
+.chart-container h2 {
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  font-size: 1.3em;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.chart-wrapper {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.chart-description {
+  background: #f5f5f5;
+  padding: 15px 20px;
+  margin-bottom: 30px;
+  color: #666;
+  font-size: 0.9em;
+  line-height: 1.6;
+  border-left: 3px solid #1a1a1a;
+}
+
+.table-container {
+  background: white;
+  padding: 40px;
+  border: 1px solid #e0e0e0;
+  overflow-x: auto;
+}
+
+.table-container h2 {
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  font-size: 1.3em;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #fafafa;
+  color: #666;
+  padding: 16px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95em;
+}
+
+tr:hover {
+  background: #fafafa;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.chain-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 0.8em;
+  font-weight: 500;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  border: 1px solid #e0e0e0;
+  letter-spacing: 0.3px;
+}
+
+.route-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.75em;
+  font-weight: 500;
+  color: white;
+  margin: 2px;
+  border-radius: 3px;
+}
+
+.token-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.token-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.pair-cell {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  font-size: 1.2em;
+  padding: 100px 50px;
+}
+
+.rank-cell {
+  color: #999;
+  font-weight: 500;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 25px;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 0.85em;
+  color: #333;
+  font-weight: 500;
+}

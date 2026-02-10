@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Pair Volume Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="./style.css"></link>
+</head>
+<body>
+    <div class="container">
+        <h1>Token Pair Volume Analytics</h1>
+        <p class="subtitle">Real-time cross-chain trading volume analysis from LI.FI Protocol</p>
+        
+        <div id="loading" class="loading">Loading data from API...</div>
+        
+        <div id="dashboard" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Volume</h3>
+                    <div class="value" id="totalVolume">$0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Transactions</h3>
+                    <div class="value" id="totalTxs">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Pairs</h3>
+                    <div class="value" id="uniquePairs">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Routes Used</h3>
+                    <div class="value" id="uniqueRoutes">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg Transaction</h3>
+                    <div class="value" id="avgTx">$0</div>
+                </div>
+            </div>
+            
+            <div class="pagination-controls">
+                <div class="pagination-info">
+                    Loaded <strong id="currentCount">0</strong> transactions
+                    <span id="cursorInfo"></span>
+                </div>
+                <div class="pagination-buttons">
+                    <button class="btn btn-secondary" id="loadMoreBtn" onclick="loadMoreData()">
+                        Load More Data
+                    </button>
+                    <button class="btn" id="refreshBtn" onclick="refreshData()">
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h2>Top 10 Trading Pairs by Volume</h2>
+                <p class="chart-description">
+                    Cross-chain trading pairs showing token and chain combinations. Each pair represents a unique FROM token/chain to TO token/chain route.
+                </p>
+                <canvas id="pairChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h2>Routes by Trading Pair</h2>
+                <p class="chart-description">
+                    See which routes LI.FI uses for each trading pair. Each color represents a different exchange or protocol (Uniswap, SushiSwap, etc.). 
+                    The bar size shows the volume routed through each protocol.
+                </p>
+                <div id="routeLegend" class="legend-grid"></div>
+                <canvas id="pairRouteChart" style="margin-top: 30px;"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h2>Routes Used by LI.FI</h2>
+                <p class="chart-description">LI.FI is a bridge/DEX aggregator that finds the best route for your swap. Each "tool" represents a different exchange or protocol (like Uniswap, SushiSwap, etc.) that LI.FI routes through to get you the best price.</p>
+                <canvas id="routeChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h2>Volume by Chain</h2>
+                <div class="chart-wrapper">
+                    <canvas id="chainChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h2>All Trading Pairs</h2>
+                <table id="pairTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Trading Pair</th>
+                            <th>Routes</th>
+                            <th>Volume (USD)</th>
+                            <th>Transactions</th>
+                            <th>Avg Size</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="./index.js"></script>
+</body>
+</html>
