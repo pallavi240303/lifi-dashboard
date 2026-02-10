@@ -42,9 +42,13 @@ export function analyzeData(data) {
 
     const volume = parseFloat(tx.sending.amountUSD) || 0;
 
+    // Get the actual swap/bridge tool, skipping internal fee steps
     let tool = tx.tool || "Unknown";
     if (tx.sending.includedSteps && tx.sending.includedSteps.length > 0) {
-      tool = tx.sending.includedSteps[0].tool || tool;
+      const realStep = tx.sending.includedSteps.find(
+        (s) => s.tool && s.tool !== "feeCollection"
+      );
+      tool = realStep ? realStep.tool : tx.tool || "Unknown";
     }
 
     if (!pairVolumes[pair]) {
@@ -84,6 +88,44 @@ export function analyzeData(data) {
     routeVolumes[tool].count += 1;
   });
 
-  return { pairVolumes, chainVolumes, routeVolumes, totalVolume, totalTxs };
+  // Top transactions by volume (top 20)
+  const topTransactions = data
+    .map((tx) => {
+      const vol = parseFloat(tx.sending.amountUSD) || 0;
+      const fromSymbol = tx.sending.token?.symbol || "?";
+      const toSymbol = tx.receiving.token?.symbol || "?";
+      const fromChain = getChainName(tx.sending.chainId);
+      const toChain = getChainName(tx.receiving.chainId);
+      const fromIcon = tx.sending.token?.logoURI;
+      const toIcon = tx.receiving.token?.logoURI;
+
+      let route = tx.tool || "Unknown";
+      if (tx.sending.includedSteps && tx.sending.includedSteps.length > 0) {
+        const realStep = tx.sending.includedSteps.find(
+          (s) => s.tool && s.tool !== "feeCollection"
+        );
+        route = realStep ? realStep.tool : tx.tool || "Unknown";
+      }
+
+      return {
+        transactionId: tx.transactionId,
+        volume: vol,
+        rawVolume: tx.sending.amountUSD || "0", // preserve exact string from API
+        fromSymbol,
+        toSymbol,
+        fromChain,
+        toChain,
+        fromIcon,
+        toIcon,
+        route,
+        integrator: tx.metadata?.integrator || "unknown",
+        explorerLink: tx.lifiExplorerLink || null,
+        timestamp: tx.sending.timestamp || tx.receiving.timestamp,
+      };
+    })
+    .sort((a, b) => b.volume - a.volume)
+    .slice(0, 20);
+
+  return { pairVolumes, chainVolumes, routeVolumes, totalVolume, totalTxs, topTransactions };
 }
 

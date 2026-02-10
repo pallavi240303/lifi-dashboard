@@ -17,6 +17,7 @@ import PairRouteChart from "./components/PairRouteChart";
 import RouteChart from "./components/RouteChart";
 import ChainChart from "./components/ChainChart";
 import PairTable from "./components/PairTable";
+import TopTransactions from "./components/TopTransactions";
 
 ChartJS.register(
   CategoryScale,
@@ -35,9 +36,12 @@ export default function App() {
     fetching,
     fetchedCount,
     totalLoaded,
+    filteredCount,
     selectedDate,
     setDate,
     refresh,
+    btcFilter,
+    toggleBtcFilter,
   } = useTransferData();
 
   const sortedPairs = useMemo(() => {
@@ -85,6 +89,10 @@ export default function App() {
           selectedDate={selectedDate}
           onApply={setDate}
           fetching={fetching}
+          btcFilter={btcFilter}
+          onToggleBtcFilter={toggleBtcFilter}
+          totalLoaded={totalLoaded}
+          filteredCount={filteredCount}
         />
 
         <PaginationControls
@@ -97,7 +105,10 @@ export default function App() {
         {analysis && (
           <>
             <StatsGrid analysis={analysis} />
-            <PairChart sortedPairs={sortedPairs} />
+            <TopTransactions
+              topTransactions={analysis.topTransactions}
+              totalVolume={analysis.totalVolume}
+            />
             <PairRouteChart sortedPairs={sortedPairs} />
             <RouteChart sortedRoutes={sortedRoutes} />
             <ChainChart chainVolumes={analysis.chainVolumes} />

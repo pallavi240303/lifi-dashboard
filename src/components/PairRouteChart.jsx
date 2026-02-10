@@ -1,5 +1,5 @@
 import { Bar } from "react-chartjs-2";
-import { getRouteColor, getRouteColorMap } from "../utils/colors";
+import { getRouteColor } from "../utils/colors";
 
 export default function PairRouteChart({ sortedPairs }) {
   const top10 = sortedPairs.slice(0, 10);
@@ -10,12 +10,15 @@ export default function PairRouteChart({ sortedPairs }) {
   });
 
   const routeArray = Array.from(allRoutes);
-  const datasets = routeArray.map((route) => ({
-    label: route.charAt(0).toUpperCase() + route.slice(1),
-    data: top10.map(([, data]) => data.routes[route]?.volume || 0),
-    backgroundColor: getRouteColor(route),
-    borderWidth: 0,
-  }));
+  // Only include routes that have > $0 volume for at least one pair
+  const datasets = routeArray
+    .map((route) => ({
+      label: route.charAt(0).toUpperCase() + route.slice(1),
+      data: top10.map(([, data]) => data.routes[route]?.volume || 0),
+      backgroundColor: getRouteColor(route),
+      borderWidth: 0,
+    }))
+    .filter((ds) => ds.data.some((v) => v > 0));
 
   const chartData = {
     labels: top10.map(([pair]) => pair),
@@ -32,6 +35,7 @@ export default function PairRouteChart({ sortedPairs }) {
     plugins: {
       legend: { display: false },
       tooltip: {
+        filter: (item) => item.parsed.y > 0,
         callbacks: {
           label: (ctx) => `${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString()}`,
         },
@@ -55,7 +59,8 @@ export default function PairRouteChart({ sortedPairs }) {
     },
   };
 
-  const colorMap = getRouteColorMap();
+  // Build legend only from routes that appear in the datasets
+  const activeRoutes = new Set(datasets.map((ds) => ds.label.toLowerCase()));
 
   return (
     <div className="bg-white p-10 mb-12 border border-gray-200">
@@ -66,16 +71,16 @@ export default function PairRouteChart({ sortedPairs }) {
         See which routes LI.FI uses for each trading pair. Each color represents a different exchange or protocol (Uniswap, SushiSwap, etc.). The bar size shows the volume routed through each protocol.
       </p>
 
-      {/* Route Legend */}
+      {/* Route Legend — only routes with volume */}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 mt-6 p-5 bg-gray-50 border border-gray-200">
-        {Object.entries(colorMap).map(([route, color]) => (
-          <div key={route} className="flex items-center gap-2.5">
+        {datasets.map((ds) => (
+          <div key={ds.label} className="flex items-center gap-2.5">
             <div
               className="w-5 h-5 rounded-sm shrink-0"
-              style={{ backgroundColor: color }}
+              style={{ backgroundColor: ds.backgroundColor }}
             />
             <span className="text-sm text-gray-700 font-medium">
-              {route.charAt(0).toUpperCase() + route.slice(1)}
+              {ds.label}
             </span>
           </div>
         ))}

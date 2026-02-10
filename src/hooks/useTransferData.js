@@ -16,6 +16,26 @@ function dateToUTCRange(dateStr) {
   return { from, to };
 }
 
+/** Fetch with automatic retry on transient network errors (e.g. ERR_QUIC_PROTOCOL_ERROR) */
+async function fetchWithRetry(url, retries = 3, delayMs = 1000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      return response;
+    } catch (err) {
+      const isLastAttempt = attempt === retries;
+      if (isLastAttempt) throw err;
+      console.warn(
+        `[LI.FI Fetch] Attempt ${attempt} failed: ${err.message}. Retrying in ${delayMs}ms...`
+      );
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+}
+
 export function useTransferData() {
   const today = todayUTC();
   const { from: initFrom, to: initTo } = dateToUTCRange(today);
@@ -24,12 +44,20 @@ export function useTransferData() {
   const [fromTimestamp, setFromTimestamp] = useState(initFrom);
   const [toTimestamp, setToTimestamp] = useState(initTo);
   const [allData, setAllData] = useState([]);
+  const [btcFilter, setBtcFilter] = useState(true); // ON by default
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [fetchedCount, setFetchedCount] = useState(0);
   const [fetching, setFetching] = useState(false);
   const abortRef = useRef(null);
+
+  /** Check if a transaction involves a BTC-like asset (symbol contains "btc") */
+  const isBtcTx = useCallback((tx) => {
+    const sendSymbol = (tx.sending?.token?.symbol || "").toLowerCase();
+    const recvSymbol = (tx.receiving?.token?.symbol || "").toLowerCase();
+    return sendSymbol.includes("btc") || recvSymbol.includes("btc");
+  }, []);
 
   const fetchAllPages = useCallback(async (fromTs, toTs) => {
     // Abort any in-flight fetch cycle
@@ -72,13 +100,10 @@ export function useTransferData() {
           params.set("next", nextCursor);
         }
 
-        console.log(`[LI.FI Fetch] Page ${pageNum}: ${API_BASE}?${params.toString()}`);
+        const url = `${API_BASE}?${params.toString()}`;
+        console.log(`[LI.FI Fetch] Page ${pageNum}: ${url}`);
 
-        const response = await fetch(`${API_BASE}?${params.toString()}`);
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
+        const response = await fetchWithRetry(url);
         const result = await response.json();
         const transfers = result.data || [];
 
@@ -121,7 +146,12 @@ export function useTransferData() {
       );
 
       setAllData(accumulated);
-      setAnalysis(analyzeData(accumulated));
+      // Apply BTC filter if active, then analyze
+      const filtered = btcFilter ? accumulated.filter(isBtcTx) : accumulated;
+      console.log(
+        `[BTC Filter] ${btcFilter ? "ON" : "OFF"}: ${filtered.length} of ${accumulated.length} transactions pass filter`
+      );
+      setAnalysis(analyzeData(filtered));
     } catch (err) {
       if (!thisRun.aborted) {
         setError(err.message || "Error loading data. Please check the API.");
@@ -132,7 +162,20 @@ export function useTransferData() {
         setFetching(false);
       }
     }
-  }, []);
+  }, [btcFilter, isBtcTx]);
+
+  /** Toggle BTC filter on/off — re-analyzes without re-fetching */
+  const toggleBtcFilter = useCallback(() => {
+    setBtcFilter((prev) => {
+      const next = !prev;
+      const filtered = next ? allData.filter(isBtcTx) : allData;
+      console.log(
+        `[BTC Filter Toggle] ${next ? "ON" : "OFF"}: ${filtered.length} of ${allData.length} transactions pass filter`
+      );
+      setAnalysis(analyzeData(filtered));
+      return next;
+    });
+  }, [allData, isBtcTx]);
 
   /** Called from DateFilter — single date string YYYY-MM-DD */
   const setDate = useCallback(
@@ -155,6 +198,9 @@ export function useTransferData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Compute filtered count for display
+  const filteredCount = btcFilter ? allData.filter(isBtcTx).length : allData.length;
+
   return {
     analysis,
     loading,
@@ -162,10 +208,13 @@ export function useTransferData() {
     fetching,
     fetchedCount,
     totalLoaded: allData.length,
+    filteredCount,
     selectedDate,
     fromTimestamp,
     toTimestamp,
     setDate,
     refresh,
+    btcFilter,
+    toggleBtcFilter,
   };
 }

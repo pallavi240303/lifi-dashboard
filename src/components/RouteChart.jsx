@@ -55,7 +55,15 @@ const labelHoverPlugin = {
   },
 };
 
-export default function RouteChart({ sortedRoutes }) {
+export default function RouteChart({ sortedRoutes: rawRoutes }) {
+  // Filter out feeCollection and routes with $0 volume
+  const sortedRoutes = rawRoutes.filter(
+    ([route, data]) => route.toLowerCase() !== "feecollection" && data.volume > 0
+  );
+
+  // Compute total volume for percentage labels
+  const totalRouteVolume = sortedRoutes.reduce((sum, [, d]) => sum + d.volume, 0);
+
   const chartRef = useRef(null);
 
   // Change cursor to pointer when hovering labels
@@ -74,9 +82,13 @@ export default function RouteChart({ sortedRoutes }) {
   }, []);
 
   const data = {
-    labels: sortedRoutes.map(
-      ([route]) => route.charAt(0).toUpperCase() + route.slice(1)
-    ),
+    labels: sortedRoutes.map(([route, d]) => {
+      const name = route.charAt(0).toUpperCase() + route.slice(1);
+      const pct = totalRouteVolume > 0
+        ? ((d.volume / totalRouteVolume) * 100).toFixed(1)
+        : "0.0";
+      return `${name} (${pct}%)`;
+    }),
     datasets: [
       {
         label: "Volume (USD)",

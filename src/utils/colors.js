@@ -1,27 +1,27 @@
 const routeColors = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#FFA07A",
-  "#98D8C8",
-  "#F7DC6F",
-  "#BB8FCE",
-  "#85C1E2",
-  "#F8B739",
-  "#52B788",
-  "#E76F51",
-  "#2A9D8F",
-  "#E9C46A",
-  "#F4A261",
-  "#264653",
-  "#E63946",
-  "#A8DADC",
-  "#457B9D",
-  "#1D3557",
-  "#F1FAEE",
+  "#E63946", // red
+  "#2A9D8F", // teal
+  "#457B9D", // steel blue
+  "#E76F51", // burnt orange
+  "#6A4C93", // purple
+  "#1982C4", // bright blue
+  "#6DB65B", // green
+  "#1D3557", // navy
+  "#E8A838", // golden amber
+  "#D4687A", // dusty rose
+  "#43AA8B", // emerald
+  "#9B72AA", // soft violet
+  "#F3722C", // deep orange
+  "#3D85C6", // cornflower
+  "#82B366", // olive green
+  "#C1447A", // magenta
+  "#5B9279", // forest teal
+  "#A65C32", // sienna
+  "#5A7DA8", // slate blue
+  "#B8860B", // dark goldenrod
 ];
 
-const routeColorMap = {};
+let routeColorMap = {};
 let colorIndex = 0;
 
 export function getRouteColor(route) {
