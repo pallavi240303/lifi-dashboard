@@ -51,6 +51,8 @@ export function analyzeData(data) {
       tool = realStep ? realStep.tool : tx.tool || "Unknown";
     }
 
+    const integrator = tx.metadata?.integrator || "unknown";
+
     if (!pairVolumes[pair]) {
       pairVolumes[pair] = {
         volume: 0,
@@ -62,6 +64,7 @@ export function analyzeData(data) {
         side2Chain,
         side2Icon,
         routes: {},
+        integrators: {},
       };
     }
 
@@ -73,6 +76,12 @@ export function analyzeData(data) {
     }
     pairVolumes[pair].routes[tool].volume += volume;
     pairVolumes[pair].routes[tool].count += 1;
+
+    if (!pairVolumes[pair].integrators[integrator]) {
+      pairVolumes[pair].integrators[integrator] = { volume: 0, count: 0 };
+    }
+    pairVolumes[pair].integrators[integrator].volume += volume;
+    pairVolumes[pair].integrators[integrator].count += 1;
 
     totalVolume += volume;
 

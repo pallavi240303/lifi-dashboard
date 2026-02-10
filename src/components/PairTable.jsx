@@ -10,7 +10,7 @@ export default function PairTable({ sortedPairs: allPairs }) {
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            {["Rank", "Trading Pair", "Routes", "Volume (USD)", "Transactions", "Avg Size"].map(
+            {["Rank", "Trading Pair", "Routes", "Integrators", "Volume (USD)", "Transactions", "Avg Size"].map(
               (header) => (
                 <th
                   key={header}
@@ -25,6 +25,10 @@ export default function PairTable({ sortedPairs: allPairs }) {
         <tbody>
           {sortedPairs.map(([pair, data], index) => {
             const topRoutes = Object.entries(data.routes)
+              .sort((a, b) => b[1].volume - a[1].volume)
+              .slice(0, 3);
+
+            const topIntegrators = Object.entries(data.integrators || {})
               .sort((a, b) => b[1].volume - a[1].volume)
               .slice(0, 3);
 
@@ -64,17 +68,47 @@ export default function PairTable({ sortedPairs: allPairs }) {
                   </div>
                 </td>
                 <td className="px-4 py-4 text-sm">
-                  {topRoutes.map(([route]) => (
-                    <span
-                      key={route}
-                      className="inline-block px-2 py-1 text-xs font-medium text-white m-0.5 rounded-sm"
-                      style={{ backgroundColor: getRouteColor(route) }}
-                    >
-                      {route}
-                    </span>
-                  ))}
+                  <div className="flex flex-col gap-1">
+                    {topRoutes.map(([route, routeData]) => {
+                      const pct = data.volume > 0
+                        ? ((routeData.volume / data.volume) * 100).toFixed(1)
+                        : "0.0";
+                      return (
+                        <div key={route} className="flex items-center gap-1.5">
+                          <span
+                            className="inline-block px-2 py-0.5 text-xs font-medium text-white rounded-sm whitespace-nowrap"
+                            style={{ backgroundColor: getRouteColor(route) }}
+                          >
+                            {route}
+                          </span>
+                          <span className="text-xs text-gray-400 whitespace-nowrap">
+                            {pct}%
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </td>
                 <td className="px-4 py-4 text-sm">
+                  <div className="flex flex-col gap-1">
+                    {topIntegrators.map(([integrator, intData]) => {
+                      const pct = data.volume > 0
+                        ? ((intData.volume / data.volume) * 100).toFixed(1)
+                        : "0.0";
+                      return (
+                        <div key={integrator} className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-700 font-medium whitespace-nowrap">
+                            {integrator}
+                          </span>
+                          <span className="text-xs text-gray-400 whitespace-nowrap">
+                            {pct}%
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-sm font-semibold text-gray-900">
                   ${data.volume.toLocaleString("en-US", { maximumFractionDigits: 2 })}
                 </td>
                 <td className="px-4 py-4 text-sm">{data.count}</td>
