@@ -67,13 +67,13 @@ export default function App() {
     );
   }
 
-  if (error && !analysis) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    );
-  }
+  // if (error && !analysis) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <p className="text-red-500 text-lg">{error}</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 px-5 py-10 text-gray-900 font-sans">
