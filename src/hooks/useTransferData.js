@@ -27,7 +27,7 @@ async function fetchWithRetry(url, retries = 3, delayMs = 1000) {
       return response;
     } catch (err) {
       const isLastAttempt = attempt === retries;
-      if (isLastAttempt) throw err;
+      if (isLastAttempt) console.log(err);
       console.warn(
         `[LI.FI Fetch] Attempt ${attempt} failed: ${err.message}. Retrying in ${delayMs}ms...`
       );
