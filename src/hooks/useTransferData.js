@@ -20,7 +20,7 @@ function dateToUTCRange(dateStr) {
 async function fetchWithRetry(url, retries = 3, delayMs = 1000) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { keepalive: false });
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
@@ -118,7 +118,7 @@ export function useTransferData() {
         if (thisRun.aborted) return;
         setFetchedCount(accumulated.length);
 
-        const prevCursor = nextCursor;
+        const prevCursor = nextCursor ;
         nextCursor = result.next || null;
         hasMore = result.hasNext === true;
 
